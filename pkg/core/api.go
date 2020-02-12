@@ -152,7 +152,7 @@ func CheckIdClient(checkId int64, db *sql.DB) (idAccept int64, err error) {
 	return idAccept, nil
 }
 
-func GetNameSurnameFromIdClient(idClient int, db *sql.DB) (nameClient, surnameClient string, err error) {
+func GetNameSurnameFromIdClient(idClient int64, db *sql.DB) (nameClient, surnameClient string, err error) {
 	err = db.QueryRow(DSN.GetLoginPassManager, idClient).Scan(&nameClient, &surnameClient)
 	if err != nil {
 		if err == sql.ErrNoRows {
