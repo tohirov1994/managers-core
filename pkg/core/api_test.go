@@ -12,6 +12,8 @@ import (
 const dbDriver = "sqlite3"
 const dbMemory = ":memory:"
 
+const existDB = "../../../database/db.sqlite"
+
 func TestSignIn_QueryError(t *testing.T) {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
@@ -475,9 +477,45 @@ INSERT INTO clients_cards VALUES
 		t.Errorf("just be 256: %d", pan)
 	}
 }
-*/
+
 
 func TestCheckIdClient_Ok(t *testing.T)  {
+	db, err := sql.Open(dbDriver, existDB)
+	if err != nil {
+		t.Errorf("can't opne db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	_, err = db.Query(`
+CREATE TABLE if NOT EXISTS clients
+(
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT    NOT NULL,
+    surname  TEXT    NOT NULL,
+    login    TEXT    NOT NULL UNIQUE,
+    password TEXT    NOT NULL
+);`)
+	if err != nil {
+		t.Errorf("can't create table for lastPAN %v", err)
+	}
+	_, err = db.Query(`
+INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON  CONFLICT DO NOTHING;`)
+	if err != nil {
+		t.Errorf("can't insert data to client for check IdClient %v", err)
+	}
+	clientId, err := CheckIdClient(1, db)
+	if err != nil {
+		t.Errorf("can't checking id: %v", err)
+	}
+	if clientId != 1 {
+		t.Errorf("Client id just be 1: %d", clientId)
+	}
+}
+
+func TestGetNameSurnameFromIdClient_Ok(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
 		t.Errorf("can't opne db: %v", err)
@@ -488,25 +526,32 @@ func TestCheckIdClient_Ok(t *testing.T)  {
 		}
 	}()
 	_, err = db.Query(`
-CREATE TABLE clients_cards
+CREATE TABLE if NOT EXISTS clients
 (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    pan        INTEGER NOT NULL UNIQUE,
-    pin        INTEGER NOT NULL,
-    balance    INTEGER NOT NULL,
-    holderName TEXT    NOT NULL,
-    cvv        INTEGER NOT NULL,
-    validity   INTEGER NOT NULL,
-    client_id  INTEGER NOT NULL REFERENCES clients
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT    NOT NULL,
+    surname  TEXT    NOT NULL,
+    login    TEXT    NOT NULL UNIQUE,
+    password TEXT    NOT NULL
 );`)
 	if err != nil {
 		t.Errorf("can't create table for lastPAN %v", err)
 	}
 	_, err = db.Query(`
-INSERT INTO clients_cards VALUES 
-(1, 2021600000000000, 1994, 1000000, 'ADMIN CLIENT', 333, 0222, 1);
-`)
+INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON  CONFLICT DO NOTHING;`)
 	if err != nil {
-		t.Errorf("can't insert data to table for lastPAN %v", err)
+		t.Errorf("can't insert data to client for check IdClient %v", err)
+	}
+	clientName, clientSurname, err := GetNameSurnameFromIdClient(1, db)
+	if err != nil {
+		t.Errorf("can't checking id: %v", err)
+	}
+	if clientName != "Admin" {
+		t.Errorf("Client name just be Admin: %s", clientName)
+	}
+	if clientSurname != "Administrator" {
+		t.Errorf("Client surname just be Administrator: %s", clientSurname)
 	}
 }
+
+ */
