@@ -144,12 +144,11 @@ func PANLastPlusOne(db *sql.DB) (pan int64, err error) {
 }
 
 func CheckIdClient(id int64, db *sql.DB) (idAccept int64, err error) {
-	db.QueryRow(DSN.CheckIdClient, idAccept).Scan(&id)
+	db.QueryRow(DSN.CheckIdClient, id).Scan(&idAccept)
 	if err != nil {
 		fmt.Printf("can't find Client Id: %v", err)
 		return 0, err
 	}
-	idAccept = id
 	return idAccept, nil
 }
 

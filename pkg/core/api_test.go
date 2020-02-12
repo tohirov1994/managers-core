@@ -476,3 +476,37 @@ INSERT INTO clients_cards VALUES
 	}
 }
 */
+
+func TestCheckIdClient_Ok(t *testing.T)  {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		t.Errorf("can't opne db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	_, err = db.Query(`
+CREATE TABLE clients_cards
+(
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    pan        INTEGER NOT NULL UNIQUE,
+    pin        INTEGER NOT NULL,
+    balance    INTEGER NOT NULL,
+    holderName TEXT    NOT NULL,
+    cvv        INTEGER NOT NULL,
+    validity   INTEGER NOT NULL,
+    client_id  INTEGER NOT NULL REFERENCES clients
+);`)
+	if err != nil {
+		t.Errorf("can't create table for lastPAN %v", err)
+	}
+	_, err = db.Query(`
+INSERT INTO clients_cards VALUES 
+(1, 2021600000000000, 1994, 1000000, 'ADMIN CLIENT', 333, 0222, 1);
+`)
+	if err != nil {
+		t.Errorf("can't insert data to table for lastPAN %v", err)
+	}
+}
