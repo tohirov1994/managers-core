@@ -436,7 +436,6 @@ func TestPANLastPlusOne_QueryError(t *testing.T) {
 	}
 }
 
-/*
 func TestPANLastPlusOne_QueryOK(t *testing.T) {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
@@ -478,6 +477,24 @@ INSERT INTO clients_cards VALUES
 	}
 }
 
+func TestCheckIdClient_Ok_QueryError(t *testing.T)  {
+	db, err := sql.Open(dbDriver, existDB)
+	if err != nil {
+		t.Errorf("can't opne db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	clientId, err := CheckIdClient(9, db)
+	if err != nil {
+		t.Errorf("Checher just be error: %v", err)
+	}
+	if clientId != 0 {
+		t.Errorf("Client id just be 0: %d", clientId)
+	}
+}
 
 func TestCheckIdClient_Ok(t *testing.T)  {
 	db, err := sql.Open(dbDriver, existDB)
@@ -516,7 +533,7 @@ INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON 
 }
 
 func TestGetNameSurnameFromIdClient_Ok(t *testing.T)  {
-	db, err := sql.Open(dbDriver, dbMemory)
+	db, err := sql.Open(dbDriver, existDB)
 	if err != nil {
 		t.Errorf("can't opne db: %v", err)
 	}
@@ -524,9 +541,9 @@ func TestGetNameSurnameFromIdClient_Ok(t *testing.T)  {
 		if err := db.Close(); err != nil {
 			t.Errorf("can't close db: %v", err)
 		}
-	}()
+	}()/*
 	_, err = db.Query(`
-CREATE TABLE if NOT EXISTS clients
+CREATE TABLE clients
 (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     name     TEXT    NOT NULL,
@@ -538,10 +555,10 @@ CREATE TABLE if NOT EXISTS clients
 		t.Errorf("can't create table for lastPAN %v", err)
 	}
 	_, err = db.Query(`
-INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON  CONFLICT DO NOTHING;`)
+INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC');`)
 	if err != nil {
 		t.Errorf("can't insert data to client for check IdClient %v", err)
-	}
+	}*/
 	clientName, clientSurname, err := GetNameSurnameFromIdClient(1, db)
 	if err != nil {
 		t.Errorf("can't checking id: %v", err)
@@ -553,5 +570,3 @@ INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON 
 		t.Errorf("Client surname just be Administrator: %s", clientSurname)
 	}
 }
-
-*/
