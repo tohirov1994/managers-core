@@ -153,6 +153,17 @@ func CheckIdClient(id int64, db *sql.DB) (idAccept int64, err error) {
 	return idAccept, nil
 }
 
+func GetNameSurnameFromIdClient(idClient int, db *sql.DB) (nameClient, surnameClient string, err error) {
+	err = db.QueryRow(DSN.GetLoginPassManager, idClient).Scan(&nameClient, &surnameClient)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", "", err
+		}
+		return "", "", err
+	}
+	return nameClient, surnameClient, nil
+}
+
 func AddCardToClient(panCard, pinCard, balanceCard int64, holderNameCard string, cvvCard, validityCard, clientIdCard int64, db *sql.DB) (err error) {
 	tx, err := db.Begin()
 	if err != nil {

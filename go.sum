@@ -1,4 +1,4 @@
 github.com/mattn/go-sqlite3 v2.0.3+incompatible h1:gXHsfypPkaMZrKbD5209QV9jbUTJKjyR5WD3HYQSd+U=
 github.com/mattn/go-sqlite3 v2.0.3+incompatible/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=
-github.com/tohirov1994/database v0.0.0-20200212125114-c92773b890f2 h1:miiYpdpvH4M+Ri42CtIj8fG9PNNYGlt7YxU0CKD9QvY=
-github.com/tohirov1994/database v0.0.0-20200212125114-c92773b890f2/go.mod h1:So4MlVUdxeGj7efAT1Qc8gJjBEuNX285MWfQay4jYEM=
+github.com/tohirov1994/database v0.0.0-20200212145220-92f29a325158 h1:Opcglf+pbh6CscKYoL8HtWOY5KeCWl6145HJUTo128A=
+github.com/tohirov1994/database v0.0.0-20200212145220-92f29a325158/go.mod h1:So4MlVUdxeGj7efAT1Qc8gJjBEuNX285MWfQay4jYEM=
