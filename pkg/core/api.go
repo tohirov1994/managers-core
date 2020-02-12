@@ -136,11 +136,21 @@ func PANLastPlusOne(db *sql.DB) (pan int64, err error) {
 	var lastPAN int64
 	err = db.QueryRow(DSN.GetLastPAN, pan).Scan(&lastPAN)
 	if err != nil {
-		_ = fmt.Errorf("cant find last PAN Number %e", err)
+		fmt.Printf("cant find last PAN Number %v", err)
 		return 0, err
 	}
 	lastPAN = lastPAN + 1
 	return lastPAN, nil
+}
+
+func CheckIdClient(id int64, db *sql.DB) (idAccept int64, err error) {
+	db.QueryRow(DSN.CheckIdClient, idAccept).Scan(&id)
+	if err != nil {
+		fmt.Printf("can't find Client Id: %v", err)
+		return 0, err
+	}
+	idAccept = id
+	return idAccept, nil
 }
 
 func AddCardToClient(panCard, pinCard, balanceCard int64, holderNameCard string, cvvCard, validityCard, clientIdCard int64, db *sql.DB) (err error) {
