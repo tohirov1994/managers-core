@@ -243,7 +243,7 @@ func TestAddCardToClient_WithoutCardsTable(t *testing.T) {
 			t.Errorf("can't close db: %v", err)
 		}
 	}()
-	err = AddCardToClient(1234, 4444, 1000000, "Jack Jackson", 333, 1222,1, db)
+	err = AddCardToClient(1234, 4444, 1000000, "Jack Jackson", 333, 1222, 1, db)
 	if err == nil {
 		t.Errorf("error just not been nil: %v", err)
 	}
@@ -463,7 +463,7 @@ CREATE TABLE clients_cards
 		t.Errorf("can't create table for lastPAN %v", err)
 	}
 	_, err = db.Query(`
-INSERT INTO clients_cards VALUES 
+INSERT INTO clients_cards VALUES
 (1, 2021600000000000, 1994, 1000000, 'ADMIN CLIENT', 333, 0222, 1);
 `)
 	if err != nil {
@@ -554,4 +554,4 @@ INSERT INTO clients VALUES (1, 'Admin', 'Administrator', 'adminC', 'adminC') ON 
 	}
 }
 
- */
+*/
