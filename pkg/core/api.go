@@ -755,7 +755,7 @@ func DoAllForMe(db *sql.DB) (Result string, err error) {
 	if err != nil {
 		log.Fatalf("I can't converted Your manager data []struct to data []byte: %v", err)
 	}
-	managerByteXML, err := ManagersDataStructToBytesJSON(managerStructuring)
+	managerByteXML, err := ManagersDataStructToBytesXML(managerStructuring)
 	if err != nil {
 		log.Fatalf("I can't converted Your manager data []struct to data []byte: %v", err)
 	}
