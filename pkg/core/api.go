@@ -152,6 +152,15 @@ func CheckIdClient(checkId int64, db *sql.DB) (idAccept int64, err error) {
 	return idAccept, nil
 }
 
+func CheckLogin(checkLogin string, db *sql.DB) (LoginAccept string, err error) {
+	db.QueryRow(DSN.CheckLoginClient, checkLogin).Scan(&LoginAccept)
+	if err != nil {
+		fmt.Printf("can't find Client Login for chekck: %v", err)
+		return "", err
+	}
+	return LoginAccept, nil
+}
+
 func GetNameSurnameFromIdClient(idClient int64, db *sql.DB) (nameClient, surnameClient string, err error) {
 	err = db.QueryRow(DSN.GetNameSurNameFromIdClient, idClient).Scan(&nameClient, &surnameClient)
 	if err != nil {
