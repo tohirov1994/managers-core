@@ -136,7 +136,9 @@ func PANLastPlusOne(db *sql.DB) (pan int64, err error) {
 	var lastPAN int64
 	err = db.QueryRow(DSN.GetLastPAN, pan).Scan(&lastPAN)
 	if err != nil {
-		fmt.Printf("cant find last PAN Number %v", err)
+		if err == sql.ErrNoRows {
+			return 0, err
+		}
 		return 0, err
 	}
 	lastPAN = lastPAN + 1
@@ -144,18 +146,22 @@ func PANLastPlusOne(db *sql.DB) (pan int64, err error) {
 }
 
 func CheckIdClient(checkId int64, db *sql.DB) (idAccept int64, err error) {
-	db.QueryRow(DSN.CheckIdClient, checkId).Scan(&idAccept)
+	err = db.QueryRow(DSN.CheckIdClient, checkId).Scan(&idAccept)
 	if err != nil {
-		fmt.Printf("can't find Client Id: %v", err)
+		if err == sql.ErrNoRows {
+			return 0, err
+		}
 		return 0, err
 	}
 	return idAccept, nil
 }
 
 func CheckLogin(checkLogin string, db *sql.DB) (LoginAccept string, err error) {
-	db.QueryRow(DSN.CheckLoginClient, checkLogin).Scan(&LoginAccept)
+	err = db.QueryRow(DSN.CheckLoginClient, checkLogin).Scan(&LoginAccept)
 	if err != nil {
-		fmt.Printf("can't find Client Login for chekck: %v", err)
+		if err == sql.ErrNoRows {
+			return "", err
+		}
 		return "", err
 	}
 	return LoginAccept, nil

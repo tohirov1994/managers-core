@@ -85,7 +85,6 @@ func TestSignIn_NoSuchLoginFromEmptyRows(t *testing.T) {
 			t.Errorf("can't close db: %v", err)
 		}
 	}()
-
 	_, err = db.Exec(`
 	CREATE TABLE managers (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,12 +93,10 @@ func TestSignIn_NoSuchLoginFromEmptyRows(t *testing.T) {
 	if err != nil {
 		t.Errorf("can't execute query to base: %v", err)
 	}
-
 	result, err := SignIn("", "", db)
 	if err != nil {
 		t.Errorf("can't execute query from emty rows: %v", err)
 	}
-
 	if result != false {
 		t.Error("Result signIn no be true, when values account is empty")
 	}
@@ -412,10 +409,29 @@ CREATE TABLE IF NOT EXISTS atms
 	}
 }
 
-func TestPANLastPlusOne_QueryError(t *testing.T) {
+func TestPANLastPlusOne_ErrorQuery(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
-		t.Errorf("can't opne db: %v", err)
+		t.Errorf("can't open db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	id, err := PANLastPlusOne(db)
+	if err == nil {
+		t.Errorf("just be Error: %v", err)
+	}
+	if id != 0 {
+		t.Errorf("PAN just be 0: %d", id)
+	}
+}
+
+func TestPANLastPlusOne_ErrorRows(t *testing.T)  {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		t.Errorf("can't open db: %v", err)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
@@ -423,26 +439,23 @@ func TestPANLastPlusOne_QueryError(t *testing.T) {
 		}
 	}()
 	_, err = db.Exec(`
-CREATE TABLE IF NOT EXISTS clients_cards
+CREATE TABLE IF NOT EXISTS clients
 (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    pan        INTEGER NOT NULL UNIQUE,
-    pin        INTEGER NOT NULL,
-    balance    INTEGER NOT NULL,
-    holderName TEXT    NOT NULL,
-    cvv        INTEGER NOT NULL,
-    validity   INTEGER NOT NULL,
-    client_id  INTEGER NOT NULL REFERENCES clients
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT    NOT NULL,
+    surname  TEXT    NOT NULL,
+    login    TEXT    NOT NULL UNIQUE,
+    password TEXT    NOT NULL
 );`)
 	if err != nil {
 		t.Errorf("can't execute query to base: %v", err)
 	}
-	pan, err := PANLastPlusOne(db)
-	if err != nil {
-		t.Errorf("We just have Error: %v", err)
+	id, err := PANLastPlusOne(db)
+	if err == nil {
+		t.Errorf("just be Error: %v", err)
 	}
-	if pan != 1 {
-		t.Errorf("just be 1: %d", pan)
+	if id != 0 {
+		t.Errorf("PAN just be 0: %d", id)
 	}
 }
 
@@ -487,10 +500,32 @@ ON CONFLICT DO NOTHING;`)
 	}
 }
 
-func TestCheckIdClient_Ok_QueryError(t *testing.T)  {
+func TestCheckIdClient_ErrorQuery(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
-		t.Errorf("can't opne db: %v", err)
+		t.Errorf("can't open db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	if err != nil {
+		t.Errorf("can't execute query to base: %v", err)
+	}
+	id, err := CheckIdClient(1, db)
+	if err == nil {
+		t.Errorf("just be Error: %v", err)
+	}
+	if id != 0 {
+		t.Errorf("client id just be 0: %d", id)
+	}
+}
+
+func TestCheckIdClient_RowsError(t *testing.T)  {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		t.Errorf("can't open db: %v", err)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
@@ -509,12 +544,12 @@ CREATE TABLE IF NOT EXISTS clients
 	if err != nil {
 		t.Errorf("can't execute query to base: %v", err)
 	}
-	clientId, _ := CheckIdClient(9, db)
-	/*if err == nil {
-		t.Errorf("Checher just be error: %v", err)
-	}*/
-	if clientId != 0 {
-		t.Errorf("Client id just be 0: %d", clientId)
+	id, err := CheckIdClient(1, db)
+	if err == nil {
+		t.Errorf("just be Error: %v", err)
+	}
+	if id != 0 {
+		t.Errorf("client id just be 0: %d", id)
 	}
 }
 
@@ -556,6 +591,56 @@ ON CONFLICT DO NOTHING;`)
 	}
 }
 
+func TestCheckLoginClient_QueryError(t *testing.T)  {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		t.Errorf("can't open db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	result, err := CheckLogin("adminC", db)
+	if err == nil {
+		t.Errorf("can't execute CheckLoginClient: %v", err)
+	}
+	if result != "" {
+		t.Errorf("client login not exist: %s", result)
+	}
+}
+
+func TestCheckLoginClient_RowsError(t *testing.T)  {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		t.Errorf("can't open db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			t.Errorf("can't close db: %v", err)
+		}
+	}()
+	_, err = db.Exec(`
+CREATE TABLE IF NOT EXISTS clients
+(
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT    NOT NULL,
+    surname  TEXT    NOT NULL,
+    login    TEXT    NOT NULL UNIQUE,
+    password TEXT    NOT NULL
+);`)
+	if err != nil {
+		t.Errorf("can't execute query to base: %v", err)
+	}
+	result, err := CheckLogin("adminC", db)
+	if err == nil {
+		t.Errorf("can't execute CheckLoginClient: %v", err)
+	}
+	if result != "" {
+		t.Errorf("client login not exist: %s", result)
+	}
+}
+
 func TestCheckLoginClient_Ok(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
@@ -594,26 +679,6 @@ ON CONFLICT DO NOTHING;`)
 	}
 }
 
-func TestCheckLoginClient_Error(t *testing.T)  {
-	db, err := sql.Open(dbDriver, dbMemory)
-	if err != nil {
-		t.Errorf("can't open db: %v", err)
-	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			t.Errorf("can't close db: %v", err)
-		}
-	}()
-	db.Close()
-	result, err := CheckLogin("adminC", db)
-	if err == nil {
-		t.Errorf("can't execute CheckLoginClient: %v", err)
-	}
-	if result != "" {
-		t.Errorf("client login nothing: %s", result)
-	}
-}
-
 func TestGetNameSurnameFromIdClient_Error(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
@@ -648,7 +713,7 @@ CREATE TABLE IF NOT EXISTS clients
 	}
 }
 
-func TestGetNameSurnameFromIdClient_DbClose(t *testing.T)  {
+func TestGetNameSurnameFromIdClient_RowsError(t *testing.T)  {
 	db, err := sql.Open(dbDriver, dbMemory)
 	if err != nil {
 		t.Errorf("can't open db: %v", err)
