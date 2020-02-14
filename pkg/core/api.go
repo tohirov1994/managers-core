@@ -3,7 +3,6 @@ package core
 import (
 	"database/sql"
 	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	DSN "github.com/tohirov1994/database"
@@ -254,9 +253,8 @@ func AddAtmToTheBank(city, district, street string, db *sql.DB) (err error) {
 	return nil
 }
 
-//TODO ############################### MARSHALING START HERE ###############################
+// These functions get data from database and convert the data to structures
 
-//TODO ############################### CONVERTING SQL-DATA TO data-STRUCTURES ###############################
 func DbManagersToStruct(db *sql.DB) (managers []managersStruct, err error) {
 	rows, err := db.Query(DSN.GetManagerData)
 	if err != nil {
@@ -377,19 +375,11 @@ func DbServicesToStruct(db *sql.DB) (services []servicesStruct, err error) {
 	return services, nil
 }
 
-//TODO ############################### CONVERTING Data-STRUCTURES TO data[]byte ###############################
+// Converting json
+
 func ManagersDataStructToBytesJSON(manager []managersStruct) (dataBytes []byte, err error) {
 	log.Print("conversion data is started")
 	dataStringMarshalIndent, err := json.MarshalIndent(manager, "", "   ")
-	if err != nil {
-		log.Fatalf("error to converted ManagersData to data[]Byte: %v", err)
-	}
-	return dataStringMarshalIndent, err
-}
-
-func ManagersDataStructToBytesXML(manager []managersStruct) (dataBytes []byte, err error) {
-	log.Print("conversion data is started")
-	dataStringMarshalIndent, err := xml.MarshalIndent(manager, "", "   ")
 	if err != nil {
 		log.Fatalf("error to converted ManagersData to data[]Byte: %v", err)
 	}
@@ -432,7 +422,8 @@ func ServicesDataStructToBytes(service []servicesStruct) (dataBytes []byte, err 
 	return dataStringMarshalIndent, err
 }
 
-//TODO ############################### WRITING DATA[]BYTE TO FILE PATH ###############################
+// Writing json
+
 func WriteToFileManagersJSON(data []byte) (Result string, err error) {
 	_ = os.Mkdir("backup", 0666)
 	path := "backup/managers.json"
@@ -745,7 +736,8 @@ func WriteToFileServices(data []byte) (Result string, err error) {
 	return "Success", nil
 }
 
-//TODO ############################### DO ALL FOR ME ###############################
+// This function collects, converts, and writes in a single operation
+
 func DoAllForMe(db *sql.DB) (Result string, err error) {
 	managerStructuring, err := DbManagersToStruct(db)
 	if err != nil {
@@ -755,19 +747,10 @@ func DoAllForMe(db *sql.DB) (Result string, err error) {
 	if err != nil {
 		log.Fatalf("I can't converted Your manager data []struct to data []byte: %v", err)
 	}
-	managerByteXML, err := ManagersDataStructToBytesXML(managerStructuring)
-	if err != nil {
-		log.Fatalf("I can't converted Your manager data []struct to data []byte: %v", err)
-	}
 	Result, err = WriteToFileManagersJSON(managerByteJson)
 	if Result != "Success" {
 		log.Fatalf("I can't write Your manager data []byte to file: it have error: %v", Result)
 	}
-	Result, err = WriteToFileManagersXML(managerByteXML)
-	if Result != "Success" {
-		log.Fatalf("I can't write Your manager data []byte to file: it have error: %v", Result)
-	}
-	/*
 	ClientStructuring, err := DbClientsToStruct(db)
 	if err != nil {
 		log.Fatalf("I can't converted Your sql client data to your data []struct: %v", err)
@@ -816,8 +799,6 @@ func DoAllForMe(db *sql.DB) (Result string, err error) {
 	if Result != "Success" {
 		log.Fatalf("I can't write Your service data []byte to file it have error: %v", Result)
 	}
-	 */
 	return "YOU ARE LUCKY =)", nil
 }
 
-//TODO ############################### MARSHALING END HERE ###############################
