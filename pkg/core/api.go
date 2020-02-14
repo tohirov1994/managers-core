@@ -476,58 +476,6 @@ func WriteToFileManagersJSON(data []byte) (Result string, err error) {
 	return "Success", nil
 }
 
-func WriteToFileManagersXML(data []byte) (Result string, err error) {
-	_ = os.Mkdir("backup", 0666)
-	path := "backup/managers.xml"
-	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
-		log.Print("file \"", path, "\" not exist for write")
-		log.Print("file \"", path, "\" will be create")
-		var file, err = os.Create(path)
-		if err != nil {
-			return "file \"managers.xml\" could not be created successfully", err
-		}
-		defer file.Close()
-		log.Print("file \"", path, "\" created successfully")
-		log.Print("Data will saving")
-		err = ioutil.WriteFile(path, data, 0666)
-		if err != nil {
-			log.Fatal(fmt.Errorf("can't save to %s: %w", path, err))
-		}
-		log.Print("Data was saved")
-		return "Success", nil
-	}
-	log.Print("file ", path, " is exist")
-	srcFile, err := os.Open(path)
-	if err != nil {
-		log.Fatal(fmt.Errorf("can't check source file %s: %w", path, err))
-	}
-	log.Print("source file was checked successfully")
-	dateTimeBackup := time.Now().Format("backup/managersDataBackup(01-02-2006-15-04-5).xml")
-	log.Print("copy date and time for copy")
-	fmt.Println(dateTimeBackup)
-	log.Print("try create file to backup")
-	destFile, err := os.Create(dateTimeBackup)
-	if err != nil {
-		log.Fatal(fmt.Errorf("can't create file to backup %s: %w", path, err))
-	}
-	log.Print("backup file was create")
-	defer destFile.Close()
-	log.Print("try copy from file to backup file")
-	_, err = io.Copy(destFile, srcFile)
-	if err != nil {
-		log.Fatal(fmt.Errorf("can't finish copying %s: %w", path, err))
-	}
-	log.Print("file was copy to backup file")
-	log.Print("Data will saving")
-	err = ioutil.WriteFile(path, data, 0666)
-	if err != nil {
-		log.Fatal(fmt.Errorf("can't save to %s: %w", path, err))
-	}
-	log.Print("Data was saved")
-	return "Success", nil
-}
-
 func WriteToFileClients(data []byte) (Result string, err error) {
 	_ = os.Mkdir("backup", 0666)
 	path := "backup/clients.json"

@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	_ "errors"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	DSN "github.com/tohirov1994/database" //FOR Test Init
+	"log"
 	"testing"
 )
 
@@ -788,3 +790,71 @@ ON CONFLICT DO NOTHING;`)
 		t.Errorf("client surname just be Administrator: %s", surname)
 	}
 }
+
+func ExampleATMsGet_WithoutData() {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		log.Fatalf("can't open db: %v", err)
+	}
+	defer func() {
+		err= db.Close()
+		if err != nil {
+			log.Fatalf("can't close DB: %v", err)
+		}
+	}()
+	result, err := ATMsGet(db)
+	if err == nil {
+		log.Fatalf("just be err: %v", err)
+	}
+	fmt.Println(result)
+	//Output: []
+}
+
+func ExampleATMsGet_RowsError() {
+	db, err := sql.Open(dbDriver, dbMemory)
+	if err != nil {
+		log.Fatalf("can't open db: %v", err)
+	}
+	defer func() {
+		if err := db.Close(); err != nil {
+			log.Fatalf("can't close db: %v", err)
+		}
+	}()
+	_, err = db.Query(`
+CREATE TABLE IF NOT EXISTS atms
+(
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    city     TEXT NOT NULL,
+    district TEXT NOT NULL,
+    street   TEXT NOT NULL
+);`)
+	if err != nil {
+		log.Fatalf("can't creat ATM: %v", err)
+	}
+	result, err := ATMsGet(db)
+	if err == nil {
+		log.Fatalf("just be err: %v", err)
+	}
+	fmt.Println(result)
+	//Output: []
+}
+
+func ExampleATMsGet_OK() {
+	db, _ := sql.Open(dbDriver, dbMemory)
+	_, _ = db.Exec(`
+CREATE TABLE IF NOT EXISTS atms
+(
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    city     TEXT NOT NULL,
+    district TEXT NOT NULL,
+    street   TEXT NOT NULL
+);`)
+	_, _ = db.Exec(`
+INSERT INTO atms
+VALUES (1, 'Dushanbe', 'Somoni', 'Foteh51')
+ON CONFLICT DO NOTHING;`)
+	result, _ := ATMsGet(db)
+	fmt.Println(result)
+	//Output: [{1 Dushanbe Somoni Foteh51}]
+}
+
